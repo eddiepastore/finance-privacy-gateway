@@ -1,0 +1,9 @@
+kpi,period,actual,budget,unit,higher_is_better
+ARR,2026-03,49000000,52000000,usd,1
+Bookings,2026-03,3480000,4000000,usd,1
+Net Revenue Retention,2026-03,108,112,pct,1
+Gross Margin,2026-03,76,78,pct,1
+Logo Churn,2026-03,2.4,1.8,pct,0
+Sales Pipeline,2026-03,18000000,20000000,usd,1
+Headcount,2026-03,264,250,count,0
+Cash Runway,2026-03,19,22,months,1

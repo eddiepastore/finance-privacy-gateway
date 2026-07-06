@@ -1,0 +1,46 @@
+account,account_type,department,period,amount
+Subscription Revenue,revenue,Sales,2026-01,11790000
+Services Revenue,revenue,Services,2026-01,1665000
+Cost of Delivery,cogs,Services,2026-01,1800000
+Payroll,opex,Engineering,2026-01,4378500
+Benefits,opex,Engineering,2026-01,846000
+Sales Commissions,opex,Sales,2026-01,720000
+Marketing Programs,opex,Marketing,2026-01,990000
+Cloud Infrastructure,opex,Engineering,2026-01,945000
+Software Subscriptions,opex,G&A,2026-01,360000
+Professional Services,opex,G&A,2026-01,315000
+Travel,opex,Sales,2026-01,180000
+Facilities,opex,G&A,2026-01,297000
+Legal,opex,G&A,2026-01,135000
+Recruiting,opex,G&A,2026-01,198000
+Support Tooling,opex,Customer Success,2026-01,135000
+Subscription Revenue,revenue,Sales,2026-02,12445000
+Services Revenue,revenue,Services,2026-02,1757500
+Cost of Delivery,cogs,Services,2026-02,1900000
+Payroll,opex,Engineering,2026-02,4621750
+Benefits,opex,Engineering,2026-02,893000
+Sales Commissions,opex,Sales,2026-02,760000
+Marketing Programs,opex,Marketing,2026-02,1045000
+Cloud Infrastructure,opex,Engineering,2026-02,997500
+Software Subscriptions,opex,G&A,2026-02,380000
+Professional Services,opex,G&A,2026-02,332500
+Travel,opex,Sales,2026-02,190000
+Facilities,opex,G&A,2026-02,313500
+Legal,opex,G&A,2026-02,142500
+Recruiting,opex,G&A,2026-02,209000
+Support Tooling,opex,Customer Success,2026-02,142500
+Subscription Revenue,revenue,Sales,2026-03,13100000
+Services Revenue,revenue,Services,2026-03,1850000
+Cost of Delivery,cogs,Services,2026-03,2000000
+Payroll,opex,Engineering,2026-03,4865000
+Benefits,opex,Engineering,2026-03,940000
+Sales Commissions,opex,Sales,2026-03,800000
+Marketing Programs,opex,Marketing,2026-03,1100000
+Cloud Infrastructure,opex,Engineering,2026-03,1050000
+Software Subscriptions,opex,G&A,2026-03,400000
+Professional Services,opex,G&A,2026-03,350000
+Travel,opex,Sales,2026-03,200000
+Facilities,opex,G&A,2026-03,330000
+Legal,opex,G&A,2026-03,150000
+Recruiting,opex,G&A,2026-03,220000
+Support Tooling,opex,Customer Success,2026-03,150000

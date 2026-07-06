@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+output/
+*.db
+*.sqlite*
+.git/
+.venv/
+venv/
+*:Zone.Identifier
+FULL_Financial_Semantic_Obfuscation_Gateway_Engineering_Spec.md

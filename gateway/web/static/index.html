@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Finance Data Privacy Gateway</title>
+<style>
+  :root{--bg:#0e1220;--panel:#171c2e;--panel2:#1f2740;--line:#2c3552;--txt:#e7ecf6;--mut:#9aa6c2;
+        --grn:#36d399;--red:#f87272;--amb:#fbbd23;--blu:#5b8def;--accent:#7c5cff;}
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt)}
+  header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  header h1{font-size:17px;margin:0;font-weight:650}
+  header .tag{color:var(--mut);font-size:12px}
+  .controls{margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  select{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:6px 9px;font-size:13px}
+  .wrap{padding:20px 24px;max-width:1180px;margin:0 auto}
+  .gate{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;min-width:150px}
+  .chip .k{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+  .chip .v{font-size:18px;font-weight:650;margin-top:3px}
+  .proof{background:rgba(91,141,239,.08);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:18px}
+  .proof h3{margin:0 0 8px;font-size:13px;color:var(--txt)}
+  .proof ul{margin:0;padding-left:18px;color:var(--mut)}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+  .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:10px 0 14px}
+  .meta div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;overflow:hidden;text-overflow:ellipsis}
+  .ok{color:var(--grn)} .bad{color:var(--red)} .warn{color:var(--amb)}
+  .banner{border-radius:10px;padding:12px 16px;margin-bottom:18px;font-weight:600}
+  .banner.safe{background:rgba(54,211,153,.12);border:1px solid var(--grn);color:var(--grn)}
+  .banner.block{background:rgba(248,114,114,.12);border:1px solid var(--red);color:var(--red)}
+  nav{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px;flex-wrap:wrap}
+  nav button{background:none;border:none;color:var(--mut);padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:2px solid transparent}
+  nav button.active{color:var(--txt);border-bottom-color:var(--accent)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}
+  th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .sev{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:650}
+  .sev.high{background:rgba(248,114,114,.16);color:var(--red)}
+  .sev.medium{background:rgba(251,189,35,.16);color:var(--amb)}
+  .sev.low{background:rgba(91,141,239,.16);color:var(--blu)}
+  .fav-favorable{color:var(--grn)} .fav-unfavorable{color:var(--red)} .fav-neutral{color:var(--mut)}
+  .arrow{color:var(--accent);font-weight:700}
+  pre{background:#0a0e1a;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;font-size:12px;color:#cdd7ef}
+  .review{border:1px solid var(--line);border-radius:11px;padding:16px;margin-bottom:14px;background:var(--panel)}
+  .review h4{margin:0 0 8px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .facts{background:var(--panel2);border-radius:9px;padding:11px 13px;font-size:12px}
+  .facts b{color:var(--mut);font-weight:600}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 13px;cursor:pointer;font-size:12px;font-weight:600}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--mut)}
+  .md h1{font-size:20px;border-bottom:1px solid var(--line);padding-bottom:8px}
+  .md h2{font-size:15px;color:var(--blu);margin-top:20px}
+  .md li{margin:3px 0}
+  .approved{color:var(--grn);font-size:12px;font-weight:600}
+  .muted{color:var(--mut)} .small{font-size:12px}
+  footer{color:var(--mut);font-size:12px;padding:24px;text-align:center}
+
+  /* CMO design refresh: enterprise privacy review surface */
+  :root{
+    --bg:#f4f6f8;--panel:#ffffff;--panel2:#f8fafc;--line:#dde4ec;--txt:#17202a;--mut:#667383;
+    --grn:#17845f;--red:#b4233a;--amb:#9f6a12;--blu:#25476a;--accent:#25476a;
+  }
+  body{background:linear-gradient(180deg,#eef3f7 0%,#f8fafc 42%,#f4f6f8 100%);color:var(--txt);font:14px/1.5 Inter,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  header{margin:18px auto 0;max-width:1220px;padding:18px 20px;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 10px 28px rgba(31,45,61,.06)}
+  header h1{font-size:20px;font-weight:700;letter-spacing:-.02em}
+  header .tag{color:#526171;font-size:13px}
+  .controls{gap:12px}
+  select{background:#fff;color:var(--txt);border-color:#c6d0db;border-radius:8px;padding:7px 10px}
+  .wrap{max-width:1220px;padding:18px 0 22px}
+  .chip,.proof,.panel,.review,.meta div,.facts{background:#fff;border-color:var(--line);border-radius:10px;box-shadow:0 8px 22px rgba(31,45,61,.045)}
+  .chip .k,th,.muted,.small,footer{color:var(--mut)}
+  .chip .v{letter-spacing:-.03em}
+  .proof{background:#f8fafc}
+  .proof h3{color:var(--txt);font-size:14px;font-weight:700}
+  .banner{border-radius:8px;box-shadow:0 8px 22px rgba(31,45,61,.045)}
+  .banner.safe{background:#e7f5ef;border-color:#c6eadc;color:#0f6d4f}
+  .banner.block{background:#fdecef;border-color:#f4c8d0;color:#a51c30}
+  nav{padding:8px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  nav button{border-radius:7px;padding:8px 11px;color:#526171;border-bottom:0}
+  nav button.active{background:#25476a;color:#fff;border-bottom-color:transparent}
+  table{background:#fff}
+  th,td{border-bottom-color:#e5ebf1}
+  .panel{overflow:hidden}
+  .sev{border-radius:999px}
+  .sev.high{background:#fdecef;color:#a51c30}
+  .sev.medium{background:#fff7e8;color:#8a5b0b}
+  .sev.low{background:#eef3f7;color:#25476a}
+  .fav-favorable,.ok{color:#0f6d4f}.fav-unfavorable,.bad{color:#a51c30}.warn{color:#8a5b0b}
+  .arrow{color:#25476a}
+  pre{background:#f8fafc;border-color:var(--line);border-radius:8px;color:#445160}
+  .btn{background:#25476a;border:1px solid #214866;border-radius:8px;padding:8px 13px;box-shadow:none}
+  .btn.ghost{background:#fff;border-color:#c6d0db;color:#445160}
+  code{background:#eef3f7;border:1px solid #d7e1ea;border-radius:6px;color:#214866;padding:1px 4px;overflow-wrap:anywhere}
+  .approved{color:#0f6d4f}
+  input{background:#fff!important;color:var(--txt)!important;border:1px solid #c6d0db!important;border-radius:8px!important}
+  @media (max-width: 1220px){header,.wrap{margin-left:12px;margin-right:12px}.wrap{padding-top:18px}}
+  @media (max-width: 820px){header{align-items:flex-start}.controls{margin-left:0}.cols{grid-template-columns:1fr}.proof,.panel,.review{overflow-x:auto}table{min-width:640px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Finance Data Privacy Gateway</h1>
+  <span class="tag">Obfuscate sensitive finance context before model review</span>
+  <div class="controls">
+    <label class="small muted">Privacy mode
+      <select id="mode">
+        <option value="standard_finance">Standard Finance</option>
+        <option value="generalized_semantic_labels" selected>Generalized (default)</option>
+        <option value="high_privacy">High Privacy</option>
+      </select>
+    </label>
+    <label class="small muted">Audience
+      <select id="role">
+        <option value="cfo" selected>CFO</option>
+        <option value="fpa_director">FP&amp;A Director</option>
+        <option value="department_manager">Dept Manager</option>
+        <option value="board">Board</option>
+      </select>
+    </label>
+    <label class="small muted">Period
+      <select id="period"></select>
+    </label>
+    <label class="small muted">Model
+      <select id="model_provider">
+        <option value="mock" selected>Mock (deterministic)</option>
+        <option value="auto">Real (OpenAI-compatible)</option>
+      </select>
+    </label>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="banner" class="banner safe">Loading…</div>
+  <div id="gate" class="gate"></div>
+  <div id="proof"></div>
+  <nav id="tabs"></nav>
+  <div id="view"></div>
+</div>
+<footer>Demo data is synthetic. Authorized users see local finance facts; model packets receive obfuscated index points only.</footer>
+
+<script>
+const TABS = ["Data","Obfuscation Preview","Variance Dashboard","Outbound Packet","Commentary Review","Board Narrative","Audit Log"];
+const TAB_SLUGS = ["data","preview","variances","packet","review","board","audit"];
+let DATA=null, active=0;
+
+function setActive(i){
+  active=i;
+  if(TAB_SLUGS[i]) history.replaceState(null,"","#"+TAB_SLUGS[i]);
+}
+function selectTab(i){setActive(i);renderTabs();render();}
+const STATE={mode:"demo", datasetId:null, pending:null};   // demo = stateless /api/run ; persisted = a real dataset
+
+function esc(s){return String(s==null?"":s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+
+async function load(){
+  const mode=document.getElementById("mode").value, role=document.getElementById("role").value;
+  const period=document.getElementById("period").value, mp=document.getElementById("model_provider").value;
+  document.getElementById("banner").textContent="Loading…";
+  const pq = period ? `&period=${encodeURIComponent(period)}` : "";
+  const url = (STATE.mode==="persisted" && STATE.datasetId)
+    ? `/api/datasets/${STATE.datasetId}/dashboard?role=${role}${pq}`
+    : `/api/run?privacy_mode=${mode}&role=${role}${pq}&model_provider=${mp}`;
+  const r=await fetch(url);
+  DATA=await r.json();
+  if(DATA.error){document.getElementById("banner").className="banner block";document.getElementById("banner").textContent="Error: "+DATA.error;return;}
+  populatePeriods(); renderGate(); renderTabs(); render();
+}
+
+function populatePeriods(){
+  const sel=document.getElementById("period");
+  const aps=DATA.available_periods||[];
+  const cur=DATA.period;
+  sel.innerHTML=aps.map(p=>`<option value="${p}"${p===cur?" selected":""}>${p}</option>`).join("");
+}
+
+async function onPeriodChange(){
+  const period=document.getElementById("period").value;
+  if(STATE.mode==="persisted" && STATE.datasetId){
+    document.getElementById("banner").textContent="Analyzing "+period+"…";
+    await fetch(`/api/datasets/${STATE.datasetId}/run`,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({period,viewer_role:document.getElementById("role").value,
+        model_provider:document.getElementById("model_provider").value,
+        privacy_mode:document.getElementById("mode").value})});
+  }
+  await load();
+}
+
+async function onModelChange(){
+  // Re-run analysis with the chosen model in persisted mode; just reload in stateless demo.
+  if(STATE.mode==="persisted" && STATE.datasetId){ await onPeriodChange(); } else { await load(); }
+}
+
+async function rerunWithSelectedPrivacyMode(){
+  if(STATE.mode==="persisted" && STATE.datasetId){
+    document.getElementById("banner").textContent="Re-running with selected privacy mode…";
+    const period=document.getElementById("period").value||DATA.period;
+    await fetch(`/api/datasets/${STATE.datasetId}/run`,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({period,viewer_role:document.getElementById("role").value,
+        model_provider:document.getElementById("model_provider").value,
+        privacy_mode:document.getElementById("mode").value})});
+  }
+  await load();
+}
+
+function renderGate(){
+  const g=DATA.gate;
+  const safe = g.hard_leaks===0 && !g.raw_dollars_sent && !g.real_entities_sent;
+  const b=document.getElementById("banner");
+  b.className="banner "+(g.sent_to_llm&&safe?"safe":"block");
+  const modelTxt = g.llm_model ? ` (${g.llm_provider} · ${g.llm_model})` : ` (${g.llm_provider})`;
+  b.textContent = g.sent_to_llm
+    ? `✓ Packet cleared the privacy gate (${g.hard_leaks} hard leaks) and was sent to the model${modelTxt}. Output validation ${g.validation_ok?"passed":"FAILED"}. ${g.model_status_message||""}`
+    : `⛔ Packet blocked by the privacy gate (risk ${g.risk_level}). No external analysis performed.`;
+  const riskClass = g.risk_level==="critical"||g.risk_level==="high"?"bad":g.risk_level==="medium"?"warn":"ok";
+  const chips=[
+    ["Risk level",g.risk_level.toUpperCase(),riskClass],
+    ["Hard leaks",g.hard_leaks,g.hard_leaks?"bad":"ok"],
+    ["Raw dollars sent",g.raw_dollars_sent?"YES":"NO",g.raw_dollars_sent?"bad":"ok"],
+    ["Real entities sent",g.real_entities_sent?"YES":"NO",g.real_entities_sent?"bad":"ok"],
+    ["Output valid",g.validation_ok?"YES":"NO",g.validation_ok?"ok":"bad"],
+  ];
+  document.getElementById("gate").innerHTML=chips.map(c=>
+    `<div class="chip"><div class="k">${c[0]}</div><div class="v ${c[2]}">${c[1]}</div></div>`).join("");
+  const meta=DATA.packet_meta||{};
+  const pub=DATA.publication_gate||{};
+  document.getElementById("proof").innerHTML=`<div class="proof"><h3>Privacy Proof</h3>
+    <ul><li>Policy: <code>${esc(meta.policy_version||"n/a")}</code></li>
+    <li>Packet hash: <code>packet_sha256=${esc(meta.packet_sha256||"pending")}</code></li>
+    <li>Run: <code>${esc(meta.run_id||"pending")}</code> · ${esc(meta.created_at||"")}</li>
+    <li>Model status: ${esc(g.model_status_message||"")}</li>
+    <li>Publication Gate: <span class="${pub.status==="needs_redaction"?"warn":"ok"}">${esc(pub.status||"not_generated")}</span></li></ul>
+    <div class="toolbar"><button class="btn ghost" onclick="rerunWithSelectedPrivacyMode()">Re-run with selected privacy mode</button></div></div>`;
+}
+
+function renderTabs(){
+  document.getElementById("tabs").innerHTML=TABS.map((t,i)=>
+    `<button class="${i===active?"active":""}" onclick="selectTab(${i})">${t}</button>`).join("");
+}
+
+function render(){
+  const v=document.getElementById("view");
+  const name=TABS[active];
+  if(name==="Data") v.innerHTML=dataView();
+  else if(name==="Obfuscation Preview") v.innerHTML=preview();
+  else if(name==="Variance Dashboard") v.innerHTML=variances();
+  else if(name==="Outbound Packet") v.innerHTML=`<p class="muted small">This is the exact JSON sent to the model — no company name, no real entities, no dollars.</p>${packetMetaView()}<div class="toolbar"><button class="btn" onclick="copyPacketJson()">Copy packet JSON</button><button class="btn ghost" onclick="downloadPacketJson()">Download packet JSON</button><span id="packetStatus" class="small muted"></span></div><pre>${esc(JSON.stringify(DATA.packet,null,2))}</pre>`;
+  else if(name==="Commentary Review") v.innerHTML=commentary();
+  else if(name==="Board Narrative") v.innerHTML=boardView();
+  else if(name==="Audit Log") v.innerHTML=audit();
+}
+
+function packetMetaView(){
+  const m=DATA.packet_meta||{};
+  return `<div class="meta"><div><b>policy</b><br/><code>${esc(m.policy_version||"n/a")}</code></div><div><b>packet_sha256</b><br/><code>${esc(m.packet_sha256||"pending")}</code></div><div><b>run</b><br/><code>${esc(m.run_id||"pending")}</code></div><div><b>created</b><br/>${esc(m.created_at||"")}</div></div>`;
+}
+
+async function copyPacketJson(){
+  const txt=JSON.stringify(DATA.packet,null,2);
+  await navigator.clipboard.writeText(txt);
+  const el=document.getElementById("packetStatus"); if(el) el.textContent=" copied";
+}
+function downloadPacketJson(){
+  const blob=new Blob([JSON.stringify(DATA.packet,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob); const a=document.createElement("a");
+  const m=DATA.packet_meta||{}; a.href=url; a.download=`obfuscated_packet_${(m.packet_sha256||"demo").slice(0,12)}.json`; a.click();
+  URL.revokeObjectURL(url);
+  const el=document.getElementById("packetStatus"); if(el) el.textContent=" downloaded";
+}
+
+function dataView(){
+  const src = STATE.mode==="persisted"
+    ? `<span class="ok">persisted dataset</span> <code class="small">${esc(STATE.datasetId||"")}</code>`
+    : `<span class="muted">stateless demo (bundled sample data)</span>`;
+  const types=["actuals","budget","forecast","kpi","customer","vendor"];
+  return `<div class="panel" style="padding:20px">
+    <h3 style="margin-top:0">Dataset source</h3>
+    <p class="small">Now showing: ${src} · company <b>${esc(DATA.company||"")}</b> · period ${esc(DATA.period||"")}</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0">
+      <button class="btn" onclick="seed()">Load sample dataset (persistent)</button>
+      <button class="btn ghost" onclick="STATE.mode='demo';STATE.datasetId=null;load()">Reset to stateless demo</button>
+    </div>
+    <hr style="border-color:var(--line)"/>
+    <h4>Upload your own finance package</h4>
+    <p class="small muted">One CSV per scenario; headers auto-map (account, department, period, amount). Minimum: actuals + budget. Files never leave this machine; only the obfuscated packet is sent to the model.</p>
+    <div class="small">
+      ${types.map(t=>`<div style="margin:6px 0"><label style="display:inline-block;width:90px">${t}</label><input type="file" accept=".csv" id="f_${t}"/></div>`).join("")}
+      <div style="margin:8px 0"><label style="display:inline-block;width:90px">company</label><input id="companyName" placeholder="Acme, Inc." style="background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:5px"/></div>
+      <div style="margin:8px 0"><label style="display:inline-block;width:90px">period</label><input id="periodName" value="2026-03" style="background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:5px;width:110px"/></div>
+      <button class="btn" style="margin-top:10px" onclick="uploadAndMap()">Upload &amp; map columns</button>
+      <span id="uploadStatus" class="small muted"></span>
+    </div>
+    ${STATE.pending ? renderMapping() : ""}
+  </div>`;
+}
+
+const CANON_FIELDS=["(auto)","account","account_type","department","period","amount","(ignore)"];
+
+function renderMapping(){
+  const p=STATE.pending;
+  const blocks=p.mappableFiles.map(f=>`
+    <div style="margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:8px">
+      <div class="small muted" style="margin-bottom:6px">${esc(f.file_type)} — map source headers to canonical fields</div>
+      ${f.columns.map((c,i)=>`<div style="margin:3px 0"><span style="display:inline-block;width:200px">${esc(c)}</span>
+        <select id="map_${f.file_id}_${i}" data-col="${esc(c)}">
+          ${CANON_FIELDS.map(cf=>`<option value="${cf}"${cf===guessCanon(c)?" selected":""}>${cf}</option>`).join("")}
+        </select></div>`).join("")}
+    </div>`).join("");
+  return `<hr style="border-color:var(--line)"/>
+    <h4>Map columns <span class="small muted">— dataset created; confirm mappings, then run</span></h4>
+    ${blocks}
+    <button class="btn" style="margin-top:8px" onclick="confirmMappingAndRun()">Save mappings &amp; run pipeline</button>
+    <button class="btn ghost" onclick="STATE.pending=null;render()">Cancel</button>
+    <span id="mapStatus" class="small muted"></span>`;
+}
+
+function guessCanon(col){
+  const c=col.trim().toLowerCase();
+  const syn={account:["account","account name","gl account","line item"],account_type:["account_type","type"],
+    department:["department","dept","cost center","team"],period:["period","month","date"],
+    amount:["amount","actual","value","actual amount"]};
+  for(const [k,vals] of Object.entries(syn)){ if(c===k||vals.includes(c)) return k; }
+  return "(auto)";
+}
+
+async function seed(){
+  document.getElementById("banner").textContent="Seeding sample dataset…";
+  const r=await fetch("/api/demo/seed",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({privacy_mode:document.getElementById("mode").value,viewer_role:document.getElementById("role").value,
+      model_provider:document.getElementById("model_provider").value})});
+  const j=await r.json();
+  if(j.error){alert("Seed failed: "+j.error);return;}
+  STATE.mode="persisted"; STATE.datasetId=j.dataset_id; setActive(TABS.indexOf("Obfuscation Preview")); await load();
+}
+
+// Phase 1: create dataset, upload files, capture detected columns, then show the mapping screen.
+async function uploadAndMap(){
+  const status=document.getElementById("uploadStatus");
+  const types=["actuals","budget","forecast","kpi","customer","vendor"];
+  const picked=types.filter(t=>document.getElementById("f_"+t).files.length>0);
+  if(!picked.includes("actuals")||!picked.includes("budget")){status.textContent=" need at least actuals + budget";return;}
+  const company=document.getElementById("companyName").value||"Uploaded Co.";
+  const period=document.getElementById("periodName").value||"2026-03";
+  const mode=document.getElementById("mode").value;
+  status.textContent=" creating dataset…";
+  const dj=await (await fetch("/api/datasets",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({name:company,reporting_period:period,company_name:company,privacy_mode:mode})})).json();
+  const did=dj.dataset_id;
+  const mappable=[];
+  for(const t of picked){
+    const file=document.getElementById("f_"+t).files[0];
+    status.textContent=" uploading "+t+"…";
+    const up=await (await fetch(`/api/datasets/${did}/files?file_type=${t}&filename=${encodeURIComponent(file.name)}`,
+      {method:"POST",headers:{"Content-Type":"text/csv"},body:await file.text()})).json();
+    if(["actuals","budget","forecast"].includes(t)){
+      mappable.push({file_id:up.file_id, file_type:t, columns:up.columns_detected||[]});
+    }
+  }
+  STATE.pending={datasetId:did, period, mappableFiles:mappable};
+  render();   // re-render the Data tab to show the mapping screen
+}
+
+// Phase 2: save the chosen column mappings, then run the pipeline.
+async function confirmMappingAndRun(){
+  const p=STATE.pending; const status=document.getElementById("mapStatus");
+  for(const f of p.mappableFiles){
+    const mapping={};
+    f.columns.forEach((c,i)=>{
+      const v=document.getElementById(`map_${f.file_id}_${i}`).value;
+      if(v!=="(auto)" && v!=="(ignore)") mapping[c]=v;
+    });
+    if(Object.keys(mapping).length){
+      status.textContent=" saving mapping for "+f.file_type+"…";
+      await fetch(`/api/datasets/${p.datasetId}/mappings`,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({file_id:f.file_id, mapping})});
+    }
+  }
+  status.textContent=" running pipeline…";
+  const rj=await (await fetch(`/api/datasets/${p.datasetId}/run`,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({period:p.period, viewer_role:document.getElementById("role").value,
+      model_provider:document.getElementById("model_provider").value,
+      privacy_mode:document.getElementById("mode").value})})).json();
+  if(rj.error){status.textContent=" error: "+rj.error;return;}
+  STATE.mode="persisted"; STATE.datasetId=p.datasetId; STATE.pending=null;
+  setActive(TABS.indexOf("Obfuscation Preview")); await load();
+}
+
+function boardView(){
+  const gen = STATE.mode==="persisted"
+    ? `<button class="btn" onclick="generateBoard()">Generate board narrative from approved items</button> <span class="small muted">— board uses approved items only</span>`
+    : `<span class="small muted">In demo mode the board narrative is generated automatically from all drafts.</span>`;
+  const pg=DATA.publication_gate||{};
+  const safe=DATA.safe_board_markdown||"";
+  const gateBox=`<div class="proof"><h3>Publication Gate</h3><p class="small ${pg.status==="needs_redaction"?"warn":"ok"}">${esc(pg.status||"not_generated")} · findings ${(pg.findings||[]).length||0}</p>${safe&&pg.status==="needs_redaction"?`<details><summary class="small">Show redacted safe version</summary><div class="md">${mdToHtml(safe)}</div></details>`:""}</div>`;
+  return `<div class="panel" style="padding:20px"><div style="margin-bottom:14px">${gen}</div>${gateBox}<div class="md">${mdToHtml(DATA.board_markdown||"_No board narrative yet. Approve review items, then click generate._")}</div></div>`;
+}
+
+async function generateBoard(){
+  if(STATE.mode!=="persisted")return;
+  await fetch(`/api/datasets/${STATE.datasetId}/board-narrative`,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({include_only_approved_items:true,audience:document.getElementById("role").value})});
+  setActive(TABS.indexOf("Board Narrative")); await load();
+}
+
+function preview(){
+  const rows=DATA.preview.map(r=>
+    `<tr><td>${esc(r.field)}</td><td>${esc(r.real)}</td><td class="arrow">→</td><td>${esc(r.safe)}</td></tr>`).join("");
+  return `<div class="panel"><table><thead><tr><th>Field</th><th>Real (local only)</th><th></th><th>Sent to LLM</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function variances(){
+  if(!DATA.variances.length) return `<div class="panel" style="padding:20px">No material variances for this period — actuals are within materiality thresholds vs budget.</div>`;
+  const rows=DATA.variances.map(v=>
+    `<tr><td><span class="sev ${v.severity}">${v.severity}</span></td><td>${esc(v.account)}</td>
+     <td class="muted">${esc(v.department)}</td><td class="fav-${v.favorability}">${v.favorability}</td>
+     <td>${esc(v.variance)}</td><td>${v.variance_pct==null?"n/a":v.variance_pct+"%"}</td>
+     <td class="muted">${v.contribution_pct}%</td></tr>`).join("");
+  return `<div class="panel"><table><thead><tr><th>Severity</th><th>Account</th><th>Dept</th><th>Direction</th><th>vs Budget</th><th>%</th><th>Contribution</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function commentary(){
+  if(!DATA.review_items.length) return `<div class="panel" style="padding:20px" class="muted">No material variances for this period — nothing to review. (On-plan months produce no commentary.)</div>`;
+  return DATA.review_items.map(ri=>{
+    const lf=ri.local_facts||{};
+    const approved = ri.status==="approved";
+    const revision = ri.status==="revision_requested";
+    return `<div class="review"><h4>${esc(ri.title)} <span class="sev ${ri.severity}">${ri.severity}</span></h4>
+      <div class="cols">
+        <div><div class="muted small">AI draft (rehydrated)</div><p>${esc(ri.approved_text||ri.draft_text)}</p>
+          <div class="muted small">Likely drivers</div><ul>${(ri.likely_drivers||[]).map(d=>`<li>${esc(d)}</li>`).join("")}</ul></div>
+        <div><div class="facts"><div class="muted small" style="margin-bottom:6px">Local facts (never left the building)</div>
+          <div><b>vs Budget:</b> ${esc(lf.variance_vs_budget)} (${lf.variance_vs_budget_pct}%)</div>
+          <div><b>Contribution:</b> ${lf.contribution_to_total_variance_pct}%</div>
+          <div><b>Forecast rec:</b> ${esc((ri.forecast_adjustment_recommendation||{}).direction||"n/a")}</div></div></div>
+      </div>
+      <div style="margin-top:12px">${approved?'<span class="approved">✓ Approved</span>':
+        revision?`<span class="warn small" style="font-weight:600">↺ Revision requested — excluded from the board narrative until approved</span>
+         <button class="btn" style="margin-left:10px" onclick="approve('${ri.review_item_id}')">Approve</button>`:
+        `<button class="btn" onclick="approve('${ri.review_item_id}')">Approve</button>
+         <button class="btn ghost" onclick="requestRevision('${ri.review_item_id}')">Request revision</button>`}</div>
+    </div>`;
+  }).join("");
+}
+
+function audit(){
+  const rows=DATA.audit_log.map(e=>
+    `<tr><td class="muted small">${esc(e.ts.replace('T',' ').slice(0,19))}</td><td>${esc(e.action)}</td><td class="muted">${esc(e.detail)}</td></tr>`).join("");
+  return `<div class="panel"><table><thead><tr><th>Time (UTC)</th><th>Action</th><th>Detail</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+async function requestRevision(id){
+  const reason=prompt("What should the revision address? (recorded in the audit log)");
+  if(reason===null) return;
+  if(STATE.mode==="persisted"){
+    await fetch(`/api/review-items/${id}/request-revision`,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({reason,reviewer_id:document.getElementById("role").value})});
+    await load();
+  } else {
+    const ri=DATA.review_items.find(r=>r.review_item_id===id); if(ri){ri.status="revision_requested";}
+    DATA.audit_log.push({ts:new Date().toISOString(),action:"review_item_revision_requested",detail:id+": "+reason});
+    render();
+  }
+}
+
+async function approve(id){
+  if(STATE.mode==="persisted"){
+    await fetch(`/api/review-items/${id}/approve`,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({reviewer_id:document.getElementById("role").value})});
+    await load();   // re-fetch persisted state; stays on the Commentary Review tab
+  } else {
+    const ri=DATA.review_items.find(r=>r.review_item_id===id); if(ri){ri.status="approved";} render();
+  }
+}
+
+function mdToHtml(md){
+  const lines=(md||"").split("\n"); let html="",inList=false;
+  const close=()=>{if(inList){html+="</ul>";inList=false;}};
+  for(let ln of lines){
+    if(/^#\s/.test(ln)){close();html+="<h1>"+esc(ln.slice(2))+"</h1>";}
+    else if(/^##\s/.test(ln)){close();html+="<h2>"+esc(ln.slice(3))+"</h2>";}
+    else if(/^-\s/.test(ln)){if(!inList){html+="<ul>";inList=true;}html+="<li>"+inline(ln.slice(2))+"</li>";}
+    else if(/^---/.test(ln)){close();html+="<hr/>";}
+    else if(ln.trim()===""){close();}
+    else {close();html+="<p>"+inline(ln)+"</p>";}
+  }
+  close(); return html;
+}
+function inline(s){return esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/_(.+?)_/g,"<i>$1</i>");}
+
+document.getElementById("mode").addEventListener("change",rerunWithSelectedPrivacyMode);
+document.getElementById("role").addEventListener("change",load);
+document.getElementById("period").addEventListener("change",onPeriodChange);
+document.getElementById("model_provider").addEventListener("change",onModelChange);
+const initialSlug=TAB_SLUGS.indexOf((location.hash||"").replace("#",""));
+active = initialSlug>=0 ? initialSlug : TABS.indexOf("Obfuscation Preview");
+window.addEventListener("hashchange",()=>{
+  const i=TAB_SLUGS.indexOf((location.hash||"").replace("#",""));
+  if(i>=0 && i!==active){active=i;renderTabs();render();}
+});
+load();
+</script>
+</body>
+</html>

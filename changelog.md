@@ -7,7 +7,7 @@ Format: each sprint records what was built, key decisions, how to run, and the e
 
 ---
 
-## ✅ REAL-LLM VERIFICATION SPRINT 2026-07-06 — live end-to-end runs + robustness hardening (test suite 82/82)
+## ✅ REAL-LLM VERIFICATION SPRINT 2026-07-06 — live end-to-end runs + robustness hardening (test suite 81/81)
 
 First live verification of the real-LLM path (previously only the deterministic mock had ever run).
 Exercised end-to-end against a local OpenAI-compatible endpoint (Ollama, `gpt-oss:20b`); repeated
@@ -42,10 +42,17 @@ not by code; the protocol is identical.
   malformed content. Anti-hallucination checks caught a real incident during testing: a free-form
   response containing invented dollar figures was rejected by the validator.
 
-**Verification:** 82/82 tests (new `tests/test_validator_normalization.py`); repeated live demo runs
+**Verification:** 81/81 tests (new `tests/test_validator_normalization.py`); repeated live demo runs
 with `--llm openai` against Ollama passing end-to-end. README "Use a real LLM" section updated with
-local-endpoint config and the fail-closed contract. **Next step:** optional — verify against a
-hosted OpenAI/Anthropic endpoint once an API key with quota is available (protocol-identical).
+local-endpoint config and the fail-closed contract.
+
+**Independent reproduction (2026-07-07):** a separate agent session on a second machine ran the
+stranger path from a fresh clone — 81/81 tests, then a clean first-attempt live pass
+(`YES — openai_compatible`, validation passed, no retry) against its own local OpenAI-compatible
+endpoint. Its direct `api.openai.com` attempt returned HTTP 429 with a different credential (429 is
+also what `insufficient_quota` returns); the graceful mock fallback engaged exactly as designed
+against the live API error surface. **Next step:** optional — verify against a hosted
+OpenAI/Anthropic endpoint once an API key with confirmed quota is available (protocol-identical).
 
 ---
 

@@ -123,7 +123,7 @@ Prints the side-by-side obfuscation preview, gate result (0 hard leaks), materia
 python3 -m unittest discover -s tests
 ```
 
-72 passing tests including the release-blocking privacy regression (`test_privacy_regression.py`) and the FP&A bridge endpoint.
+81 passing tests including the release-blocking privacy regression (`test_privacy_regression.py`) and the FP&A bridge endpoint.
 
 **Use a real LLM** (any OpenAI-compatible endpoint — hosted or local):
 ```bash
@@ -171,7 +171,7 @@ scripts/
   run_demo.py               one-command CLI proof
   serve.py                  unified product server (UI + API + DB)
 sample_data/                synthetic finance package (fake company, planted scenarios)
-tests/                      72 tests including test_privacy_regression.py (release-blocking)
+tests/                      81 tests including test_privacy_regression.py (release-blocking)
 docs/
   api_contracts.md          REST API endpoints + curl walkthrough
 ```
@@ -237,7 +237,7 @@ The solution is a privacy architecture, not a restriction. You get the reasoning
 - In-browser column mapping
 - Section-15 REST API with SQLite persistence
 - Dockerfile + Makefile packaging
-- 72 passing tests
+- 81 passing tests
 
 See `changelog.md` for the full sprint log.
 

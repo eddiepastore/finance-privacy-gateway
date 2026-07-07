@@ -19,7 +19,7 @@ Guidance for AI coding sessions (and human contributors) working in this repo.
   generalized label).
 
 ## Commands
-- `make serve` (or `python3 scripts/serve.py`) → http://127.0.0.1:8765 (env: `GATEWAY_HOST`/`GATEWAY_PORT`)
+- `make serve` (or `python3 scripts/serve.py`) → http://127.0.0.1:8770 (env: `GATEWAY_HOST`/`GATEWAY_PORT`)
 - `python3 -m unittest discover tests` — full suite; must stay green
 - Real-LLM mode is OpenAI-compatible (set `OPENAI_API_KEY`), with graceful mock fallback.
 

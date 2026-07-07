@@ -15,7 +15,7 @@ from .finance_core import (
 )
 from .finance_core.calculations import VarianceItem
 from .finance_core.forecast import forecast_adjustment_for
-from .llm_client import SYSTEM_PROMPT, build_user_prompt, get_client, validate_response
+from .llm_client import SYSTEM_PROMPT, build_repair_prompt, build_user_prompt, get_client, validate_response
 from .obfuscation import (
     AliasVault, build_forbidden_terms, build_packet, can_send_packet, Permissions,
     rehydrate_response, score_packet, select_base_amount,
@@ -142,6 +142,20 @@ def run_pipeline(
         log("llm_response_received", "")
 
         vr = validate_response(llm_resp, packet)
+        # Validation-guided single retry: real models occasionally deviate from the contract in
+        # ways normalization can't (and shouldn't) repair, e.g. invented synthetic IDs. Feed the
+        # errors back once; the mock is deterministic so this only ever fires on real endpoints.
+        if not vr.ok and getattr(client, "provider", "") != "mock":
+            log("response_validation_retry", f"first attempt failed: {vr.errors[:4]}")
+            try:
+                retry_resp = client.complete(SYSTEM_PROMPT, build_repair_prompt(packet, vr.errors), packet)
+                retry_vr = validate_response(retry_resp, packet)
+                if retry_vr.ok:
+                    llm_resp, vr = retry_resp, retry_vr
+                else:
+                    vr.errors.extend([f"retry: {e}" for e in retry_vr.errors[:6]])
+            except Exception as e:
+                log("response_validation_retry_failed", f"{e}")
         validation_ok, validation_errors = vr.ok, vr.errors
         log("response_validation", "passed" if vr.ok else f"failed: {vr.errors}")
 
@@ -226,23 +240,32 @@ def build_board_markdown(model: CanonicalModel, period: str, rehydrated: Dict[st
             lines.append(f"- {c.get('summary','')}")
     lines.append("")
 
+    def _far(c):
+        far = c.get("forecast_adjustment_recommendation")
+        return far if isinstance(far, dict) else {}
+
     fa = [c for c in rehydrated.get("material_variance_commentary", [])
-          if c.get("forecast_adjustment_recommendation", {}).get("recommended")]
+          if _far(c).get("recommended") or _far(c).get("direction") in ("increase", "decrease")]
     if fa:
         lines += ["## Forecast Implications", ""]
         for c in fa:
-            rec = c["forecast_adjustment_recommendation"]
+            rec = _far(c)
             vi = issue_map.get(c.get("issue_id"))
             local = forecast_adjustment_for(vi) if vi is not None else None
             label = vi.account if vi is not None else c.get("issue_id")
             rng = (f" — local run-rate impact {format_money(local['low'])} to "
                    f"{format_money(local['high'])} this quarter") if local else ""
-            lines.append(f"- **{label}**: recommend forecast {rec.get('direction')} — {rec.get('reason')}{rng}")
+            why = rec.get("reason") or rec.get("rationale") or ""
+            lines.append(f"- **{label}**: recommend forecast {rec.get('direction')} — {why}{rng}")
         lines.append("")
 
     lines += ["## Risks to Monitor", ""]
     for r in rehydrated.get("risks_to_monitor", []):
-        lines.append(f"- ({r.get('severity')}) {r.get('risk')} — watch {r.get('watch_metric')}")
+        # Contract allows plain strings; the mock emits structured objects. Render both.
+        if isinstance(r, dict):
+            lines.append(f"- ({r.get('severity')}) {r.get('risk')} — watch {r.get('watch_metric')}")
+        else:
+            lines.append(f"- {r}")
     lines.append("")
 
     lines += ["## Management Actions", ""]

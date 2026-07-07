@@ -7,6 +7,48 @@ Format: each sprint records what was built, key decisions, how to run, and the e
 
 ---
 
+## ✅ REAL-LLM VERIFICATION SPRINT 2026-07-06 — live end-to-end runs + robustness hardening (test suite 82/82)
+
+First live verification of the real-LLM path (previously only the deterministic mock had ever run).
+Exercised end-to-end against a local OpenAI-compatible endpoint (Ollama, `gpt-oss:20b`); repeated
+runs now pass with real AI commentary flowing through obfuscation → LLM → validation → rehydration →
+review items → board narrative. Every failure mode observed fails closed (validation refuses, or
+visible mock fallback). A hosted-OpenAI attempt was blocked by account quota (`insufficient_quota`),
+not by code; the protocol is identical.
+
+**Found & fixed by live testing:**
+- `LLMClient` timeout was hardcoded 60s (local models need more) → `GATEWAY_LLM_TIMEOUT` env,
+  default unchanged.
+- System prompt told the model to reference findings by `item_id` while the validator required
+  `issue_id` → prompt corrected; user prompt now embeds the full response template
+  (`prompts.RESPONSE_TEMPLATE`) instead of naming keys only.
+- **Crash bug:** `build_board_markdown` assumed `risks_to_monitor` items are objects and
+  `forecast_adjustment_recommendation` is always a dict — a schema-valid response with string risks
+  crashed the pipeline after validation passed. Now renders both shapes.
+- Review items read `summary` but the template asked for `commentary` → template aligned to the
+  mock's field vocabulary (`summary`/`reason`), so real-model commentary actually reaches
+  `draft_text`.
+
+**New robustness layers (all engine-agnostic):**
+- `normalize_response()` (validator.py): mechanical shape repair before strict validation — known
+  contract keys in camelCase renamed, `item_id`→`issue_id`, `commentary`→`summary`,
+  `rationale`→`reason`, bare-string forecast recommendation coerced to an object, string
+  `board_narrative` wrapped as `{"draft": ...}`. Never invents content.
+- Validation-guided single retry (pipeline.py): on a real-endpoint validation failure, the errors
+  are sent back once via `build_repair_prompt`; mock is exempt (deterministic). Audit actions:
+  `response_validation_retry` / `response_validation_retry_failed`.
+- Decoder-enforced structured outputs (client.py): requests `response_format: json_schema`
+  (`RESPONSE_JSON_SCHEMA`, strict) with graceful fallback to `json_object` on 400/404/422 or
+  malformed content. Anti-hallucination checks caught a real incident during testing: a free-form
+  response containing invented dollar figures was rejected by the validator.
+
+**Verification:** 82/82 tests (new `tests/test_validator_normalization.py`); repeated live demo runs
+with `--llm openai` against Ollama passing end-to-end. README "Use a real LLM" section updated with
+local-endpoint config and the fail-closed contract. **Next step:** optional — verify against a
+hosted OpenAI/Anthropic endpoint once an API key with quota is available (protocol-identical).
+
+---
+
 ## ✅ REVIEW SPRINT 2026-07-02 — tab deep links + working "Request revision" (test suite 72/72)
 
 Part of a cross-project executive review driven from a cross-project executive review of the finance apps'

@@ -125,13 +125,29 @@ python3 -m unittest discover -s tests
 
 72 passing tests including the release-blocking privacy regression (`test_privacy_regression.py`) and the FP&A bridge endpoint.
 
-**Use a real LLM:**
+**Use a real LLM** (any OpenAI-compatible endpoint — hosted or local):
 ```bash
+# hosted (e.g. OpenAI)
 export OPENAI_API_KEY=sk-...
-python3 scripts/run_demo.py --llm auto
+python3 scripts/run_demo.py --llm openai
+
+# local (e.g. Ollama)
+export OPENAI_API_KEY=ollama OPENAI_BASE_URL=http://127.0.0.1:11434/v1 \
+       GATEWAY_MODEL=gpt-oss:20b GATEWAY_LLM_TIMEOUT=600
+python3 scripts/run_demo.py --llm openai
 ```
 
-The obfuscation/rehydration path is identical. Only the analysis engine changes.
+The real-LLM path is verified end-to-end against a live model. The client requests
+decoder-enforced structured outputs (`response_format: json_schema`, with plain-JSON fallback for
+servers that don't support it); responses are normalized for mechanical shape drift, validated
+(schema, known issue IDs, no invented synthetic entities, no currency amounts), and retried once
+with the validation errors if a real model deviates. If a response still fails validation, the
+gateway **fails closed**: nothing is rehydrated and the errors are reported. The
+obfuscation/rehydration path is identical regardless of engine.
+
+Env: `OPENAI_API_KEY` · `OPENAI_BASE_URL` (default `https://api.openai.com/v1`) ·
+`GATEWAY_MODEL` (default `gpt-4o-mini`) · `GATEWAY_LLM_TIMEOUT` seconds (default `60`; raise for
+local models).
 
 **Docker:**
 ```bash

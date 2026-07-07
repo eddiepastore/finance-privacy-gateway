@@ -42,10 +42,74 @@ def _collect_strings(node: Any, acc: List[str]) -> None:
         acc.append(node)
 
 
+_VALID_DIRECTIONS = ("decrease", "increase", "unchanged")
+
+# camelCase -> snake_case aliases for the known response contract keys. Real models sometimes
+# ignore the template's casing; renaming known keys is mechanical and content-preserving.
+_KEY_ALIASES = {
+    "executiveSummary": "executive_summary",
+    "materialVarianceCommentary": "material_variance_commentary",
+    "boardNarrative": "board_narrative",
+    "risksToMonitor": "risks_to_monitor",
+    "openQuestions": "open_questions",
+    "issueId": "issue_id",
+    "itemId": "issue_id",
+    "item_id": "issue_id",
+    "likelyDrivers": "likely_drivers",
+    "managementQuestions": "management_questions",
+    "recommendedAction": "recommended_action",
+    "forecastAdjustmentRecommendation": "forecast_adjustment_recommendation",
+    # models often say "commentary"/"rationale" for the mock's "summary"/"reason"
+    "commentary": "summary",
+    "rationale": "reason",
+}
+
+
+def _rename_known_keys(node: Any) -> Any:
+    if isinstance(node, dict):
+        return {_KEY_ALIASES.get(k, k): _rename_known_keys(v) for k, v in node.items()}
+    if isinstance(node, list):
+        return [_rename_known_keys(v) for v in node]
+    return node
+
+
+def normalize_response(response: Any) -> None:
+    """Repair mechanical shape deviations produced by real models, in place.
+
+    Strictly structural — never invents analytical content. Handles the deviations observed while
+    live-testing local OpenAI-compatible models:
+    - known contract keys returned in camelCase (or issue_id as item_id/itemId) are renamed;
+    - forecast_adjustment_recommendation returned as a bare string becomes an object
+      ("decrease" -> {"direction": "decrease"}; any other string is preserved as the rationale).
+    """
+    if not isinstance(response, dict):
+        return
+    renamed = _rename_known_keys(response)
+    response.clear()
+    response.update(renamed)
+    bn = response.get("board_narrative")
+    if isinstance(bn, str):
+        response["board_narrative"] = {"draft": bn}
+    mvc = response.get("material_variance_commentary")
+    if not isinstance(mvc, list):
+        return
+    for item in mvc:
+        if not isinstance(item, dict):
+            continue
+        far = item.get("forecast_adjustment_recommendation")
+        if isinstance(far, str):
+            s = far.strip().lower()
+            if s in _VALID_DIRECTIONS:
+                item["forecast_adjustment_recommendation"] = {"direction": s}
+            else:
+                item["forecast_adjustment_recommendation"] = {"reason": far}
+
+
 def validate_response(response: Dict[str, Any], packet: Dict[str, Any]) -> ValidationResult:
     errors: List[str] = []
     warnings: List[str] = []
 
+    normalize_response(response)
     schema_ok, schema_errors = validate_output_schema(response)
     errors.extend(schema_errors)
     if not schema_ok:

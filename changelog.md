@@ -3,6 +3,26 @@
 Purpose: seamless handoff. If this session times out or another model picks up, read this file
 top-to-bottom, then `README.md`, then `FULL_..._Spec.md`. Newest entries on top.
 
+## 2026-07-20 — Public-readiness pass: screenshots embedded in README, mislabeled captures fixed
+
+### Context
+Portfolio review of the public repo: the README showed no visuals, and two files in
+`screenshots/` (overview.png, audit-log.png) were mislabeled near-duplicates of the
+obfuscation-preview capture rather than the screens their names claim.
+
+### Changed
+- Recaptured `screenshots/overview.png` (Variance Dashboard) and `screenshots/audit-log.png`
+  (Audit Log) from the live app with sample data.
+- Embedded three screenshots in the README: obfuscation preview as the hero image, plus the
+  variance dashboard and audit log in the walkthrough.
+- Fixed the broken "Privacy modes" nav anchor (#privacy-modes → #privacy-modes-in-depth).
+- CLAUDE.md guidance wording tightened; repo git identity corrected for future commits.
+
+### Verification
+- Full test suite 81/81 passing after changes; embedded image paths verified tracked in git;
+  recaptures visually confirmed to show the correct tabs with synthetic data only. Pushed as
+  commit 3910927.
+
 Format: each sprint records what was built, key decisions, how to run, and the exact next step.
 
 ---

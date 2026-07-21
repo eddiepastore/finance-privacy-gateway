@@ -10,7 +10,9 @@ This gateway sits between your finance data and the model. It performs all finan
 
 The LLM sees `CLIENT_001 represents 31% of revenue` and `Revenue = 100.0 index points, -5.3% vs budget`. It never sees a company name, a real customer, a real vendor, or a single real dollar figure. Every dollar in the final board narrative is inserted locally — never produced by the model.
 
-→ [How it works](#how-it-works) · [Quick start](#quick-start) · [Privacy modes](#privacy-modes) · [Architecture](#architecture)
+→ [How it works](#how-it-works) · [Quick start](#quick-start) · [Privacy modes](#privacy-modes-in-depth) · [Architecture](#architecture)
+
+![Obfuscation Preview — what your data says vs. what the LLM receives](screenshots/obfuscation-preview.png)
 
 ---
 
@@ -110,6 +112,10 @@ Open `http://127.0.0.1:8770`, go to the **Data** tab, click **Load sample datase
 4. **Commentary Review** — approve AI-drafted commentary before it enters the narrative
 5. **Board Narrative** — the final output, with real dollars inserted locally
 6. **Audit Log** — every event in the pipeline
+
+![Variance Dashboard — local math, before any external call](screenshots/overview.png)
+
+![Audit Log — every pipeline event, timestamped](screenshots/audit-log.png)
 
 **Run the CLI demo:**
 ```bash

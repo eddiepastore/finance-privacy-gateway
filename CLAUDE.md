@@ -7,6 +7,8 @@ Guidance for AI coding sessions (and human contributors) working in this repo.
    changing anything.
 2. `README.md` — user-facing; keep it accurate (verify test counts and feature claims before citing).
 3. `docs/` — architecture, API contracts, threat model, demo script.
+4. Maintainer-local: consult the shared SKILLS.md index (internal file, not part of this
+   repo) before substituting generic workflows.
 
 ## Hard constraints
 - **Pure Python 3.10+ standard library. No pip dependencies. Ever.** The zero-dependency design is a
